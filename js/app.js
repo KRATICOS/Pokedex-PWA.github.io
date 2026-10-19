@@ -1,180 +1,258 @@
-const cafes = [
-    {
-        nombre: "Coffee 1",
-        descripcion: "Un delicioso café de sabor intenso y aroma agradable, perfecto para comenzar el día.",
-        imagen: "images/cafe1.jpg",
-        origen: "Colombia",
-        tueste: "Medio",
-        notas: "Chocolate y frutos secos",
-        precio: "$4.50"
-    },
-    {
-        nombre: "Coffee 2",
-        descripcion: "Café suave y equilibrado con un delicioso aroma, ideal para disfrutar en cualquier momento.",
-        imagen: "images/cafe2.jpg",
-        origen: "Brasil",
-        tueste: "Suave",
-        notas: "Vainilla y caramelo",
-        precio: "$4.00"
-    },
-    {
-        nombre: "Coffee 3",
-        descripcion: "Una taza de café con notas aromáticas y un sabor agradable para los amantes del café.",
-        imagen: "images/cafe3.jpg",
-        origen: "Etiopía",
-        tueste: "Alto",
-        notas: "Floral y cítricos",
-        precio: "$5.00"
-    },
-    {
-        nombre: "Coffee 4",
-        descripcion: "Café de sabor profundo y aroma intenso, preparado para acompañar tus mejores momentos.",
-        imagen: "images/cafe4.jpg",
-        origen: "Sumatra",
-        tueste: "Oscuro",
-        notas: "Especias y madera",
-        precio: "$4.80"
-    },
-    {
-        nombre: "Coffee 5",
-        descripcion: "Una opción deliciosa para quienes disfrutan de un café equilibrado y lleno de sabor.",
-        imagen: "images/cafe5.jpg",
-        origen: "Costa Rica",
-        tueste: "Medio",
-        notas: "Miel y manzana",
-        precio: "$4.60"
-    },
-    {
-        nombre: "Coffee 6",
-        descripcion: "Café aromático con un sabor agradable y una textura perfecta para disfrutar tranquilamente.",
-        imagen: "images/cafe6.jpg",
-        origen: "Guatemala",
-        tueste: "Medio-Alto",
-        notas: "Cacao amargo",
-        precio: "$4.30"
-    },
-    {
-        nombre: "Coffee 7",
-        descripcion: "Una mezcla especial de café con un aroma delicioso y un sabor que disfrutarás desde el primer sorbo.",
-        imagen: "images/cafe7.jpg",
-        origen: "Kenia",
-        tueste: "Claro",
-        notas: "Frutos rojos",
-        precio: "$5.20"
-    },
-    {
-        nombre: "Coffee 8",
-        descripcion: "Café de sabor suave y aroma agradable, ideal para acompañar una tarde tranquila.",
-        imagen: "images/cafe8.jpg",
-        origen: "México",
-        tueste: "Suave",
-        notas: "Frutos secos y panela",
-        precio: "$3.90"
-    },
-    {
-        nombre: "Coffee 9",
-        descripcion: "Una taza de café con carácter y un aroma intenso para los verdaderos amantes del café.",
-        imagen: "images/cafe9.jpg",
-        origen: "Honduras",
-        tueste: "Medio",
-        notas: "Nuez y chocolate con leche",
-        precio: "$4.20"
-    },
-    {
-        nombre: "Coffee 10",
-        descripcion: "Café especial con un delicioso aroma y un sabor equilibrado para disfrutar en cualquier ocasión.",
-        imagen: "images/cafe10.jpg",
-        origen: "Perú",
-        tueste: "Medio",
-        notas: "Frutos cítricos y caramelo",
-        precio: "$4.40"
-    }
-];
+
+const API_URL = "https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0";
 
 const container = document.querySelector(".container");
 
+let pokemones = [];
+
 if (container) {
-    // Mostrar el catálogo
-    function mostrarCatalog() {
-        sessionStorage.removeItem("cafeSeleccionado");
-
-        container.innerHTML = "";
+    async function iniciarAplicacion() {
         container.style.display = "grid";
+        container.innerHTML = "<p>Cargando Pokédex...</p>";
 
-        cafes.forEach((cafe, index) => {
-            const card = document.createElement("div");
-            card.classList.add("coffee-card");
+        try {
+            const respuesta = await fetch(API_URL);
 
-            card.innerHTML = `
-                <img src="${cafe.imagen}" alt="${cafe.nombre}">
-                <h2>${cafe.nombre}</h2>
-                <p>${cafe.descripcion}</p>
-                <button data-index="${index}" class="btn-ver-mas">
-                    Ver más
-                </button>
+            if (!respuesta.ok) {
+                throw new Error(`Error HTTP: ${respuesta.status}`);
+            }
+
+            const datos = await respuesta.json();
+
+            pokemones = datos.results.map(pokemon => {
+                const id = Number(
+                    pokemon.url.split("/").filter(Boolean).pop()
+                );
+
+                return {
+                    id,
+                    nombre: pokemon.name,
+                    url: pokemon.url,
+                    imagen: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`
+                };
+            });
+
+            mostrarCatalogo();
+
+            const guardado = sessionStorage.getItem(
+                "pokemonSeleccionado"
+            );
+
+            if (guardado !== null) {
+                const index = pokemones.findIndex(
+                    pokemon => pokemon.id === Number(guardado)
+                );
+
+                if (index !== -1) {
+                    mostrarDetalle(index);
+                }
+            }
+
+        } catch (error) {
+            console.error("Error al cargar PokéAPI:", error);
+
+            container.style.display = "block";
+            container.innerHTML = `
+                <div class="error-api">
+                    <h2>No se pudo cargar la Pokédex</h2>
+                    <p>Verifica tu conexión a Internet e inténtalo de nuevo.</p>
+                    <button id="btn-reintentar">Reintentar</button>
+                </div>
             `;
 
-            container.appendChild(card);
-        });
-
-        container.querySelectorAll(".btn-ver-mas").forEach(button => {
-            button.addEventListener("click", () => {
-                const index = Number(button.dataset.index);
-                mostrarDetalle(index);
-            });
-        });
+            document
+                .getElementById("btn-reintentar")
+                .addEventListener("click", iniciarAplicacion);
+        }
     }
 
-    // Mostrar detalles del café seleccionado
-    function mostrarDetalle(index) {
-        const cafe = cafes[index];
+    function capitalizar(texto) {
+        return texto
+            .split("-")
+            .map(palabra =>
+                palabra.charAt(0).toUpperCase() + palabra.slice(1)
+            )
+            .join(" ");
+    }
 
-        if (!cafe) {
-            mostrarCatalog();
+    function mostrarCatalogo() {
+        sessionStorage.removeItem("pokemonSeleccionado");
+
+        container.style.display = "grid";
+        container.innerHTML = "";
+
+        const fragmento = document.createDocumentFragment();
+
+        pokemones.forEach((pokemon, index) => {
+            const card = document.createElement("article");
+            card.className = "pokemon-card";
+
+            const imagen = document.createElement("img");
+            imagen.src = pokemon.imagen;
+            imagen.alt = capitalizar(pokemon.nombre);
+            imagen.loading = "lazy";
+
+            imagen.onerror = () => {
+                imagen.onerror = null;
+                imagen.src =
+                    `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
+            };
+
+            const titulo = document.createElement("h2");
+            titulo.textContent = capitalizar(pokemon.nombre);
+
+            const numero = document.createElement("p");
+            numero.textContent =
+                `N.º ${String(pokemon.id).padStart(3, "0")}`;
+
+            const boton = document.createElement("button");
+            boton.className = "btn-ver-mas";
+            boton.textContent = "Ver más";
+
+            boton.addEventListener("click", () => {
+                mostrarDetalle(index);
+            });
+
+            card.append(imagen, titulo, numero, boton);
+            fragmento.appendChild(card);
+        });
+
+        container.appendChild(fragmento);
+    }
+
+    async function mostrarDetalle(index) {
+        const pokemon = pokemones[index];
+
+        if (!pokemon) {
+            mostrarCatalogo();
             return;
         }
 
-        sessionStorage.setItem("cafeSeleccionado", String(index));
+        sessionStorage.setItem(
+            "pokemonSeleccionado",
+            String(pokemon.id)
+        );
 
         container.style.display = "block";
+        container.innerHTML = "<p>Cargando detalles del Pokémon...</p>";
 
-        container.innerHTML = `
-            <div class="coffee-detalle-card"
-                 style="padding:20px;text-align:center;">
+        try {
+            const respuesta = await fetch(pokemon.url);
 
-                <img
-                    src="${cafe.imagen}"
-                    alt="${cafe.nombre}"
-                    style="max-width:300px;width:100%;border-radius:8px;"
-                >
+            if (!respuesta.ok) {
+                throw new Error("No se pudieron obtener los detalles.");
+            }
 
-                <h2>${cafe.nombre}</h2>
+            const detalle = await respuesta.json();
 
-                <p><strong>Descripción:</strong> ${cafe.descripcion}</p>
-                <p><strong>Origen:</strong> ${cafe.origen}</p>
-                <p><strong>Tipo de tueste:</strong> ${cafe.tueste}</p>
-                <p><strong>Notas de cata:</strong> ${cafe.notas}</p>
-                <p><strong>Precio:</strong> ${cafe.precio}</p>
+            container.innerHTML = "";
 
-                <button id="btn-volver"
-                        style="padding:10px 20px;cursor:pointer;">
-                    Volver al catálogo
-                </button>
-            </div>
-        `;
+            const card = document.createElement("div");
+            card.className = "pokemon-detalle-card";
 
-        document.getElementById("btn-volver").addEventListener("click", () => {
-            mostrarCatalog();
-        });
+            const imagen = document.createElement("img");
+            imagen.src =
+                detalle.sprites.other?.["official-artwork"]?.front_default ||
+                detalle.sprites.front_default ||
+                pokemon.imagen;
+
+            imagen.alt = capitalizar(pokemon.nombre);
+
+            const titulo = document.createElement("h2");
+            titulo.textContent = capitalizar(detalle.name);
+
+            const crearParrafo = (etiqueta, valor) => {
+                const p = document.createElement("p");
+                const strong = document.createElement("strong");
+
+                strong.textContent = `${etiqueta}: `;
+                p.append(strong, document.createTextNode(valor));
+
+                return p;
+            };
+
+            card.append(
+                imagen,
+                titulo,
+                crearParrafo("Número", `#${detalle.id}`),
+                crearParrafo(
+                    "Tipos",
+                    detalle.types.map(t => t.type.name).join(", ")
+                ),
+                crearParrafo("Altura", `${detalle.height / 10} m`),
+                crearParrafo("Peso", `${detalle.weight / 10} kg`),
+                crearParrafo(
+                    "Experiencia base",
+                    String(detalle.base_experience ?? "No disponible")
+                )
+            );
+
+            const tituloHabilidades = document.createElement("h3");
+            tituloHabilidades.textContent = "Habilidades";
+            card.appendChild(tituloHabilidades);
+
+            card.appendChild(
+                crearParrafo(
+                    "Habilidades",
+                    detalle.abilities
+                        .map(a => a.ability.name)
+                        .join(", ") || "No disponibles"
+                )
+            );
+
+            const tituloEstadisticas = document.createElement("h3");
+            tituloEstadisticas.textContent = "Estadísticas";
+            card.appendChild(tituloEstadisticas);
+
+            const lista = document.createElement("ul");
+
+            detalle.stats.forEach(stat => {
+                const li = document.createElement("li");
+
+                li.textContent =
+                    `${capitalizar(stat.stat.name)}: ${stat.base_stat}`;
+
+                lista.appendChild(li);
+            });
+
+            card.appendChild(lista);
+
+            const botonVolver = document.createElement("button");
+            botonVolver.id = "btn-volver";
+            botonVolver.textContent = "Volver al catálogo";
+
+            botonVolver.addEventListener("click", mostrarCatalogo);
+
+            card.appendChild(botonVolver);
+            container.appendChild(card);
+
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+        } catch (error) {
+            console.error("Error al cargar detalles:", error);
+
+            container.innerHTML = `
+                <div class="error-api">
+                    <h2>Error al cargar el Pokémon</h2>
+                    <p>No fue posible consultar sus detalles.</p>
+                    <button id="btn-volver-catalogo">
+                        Volver al catálogo
+                    </button>
+                    <button id="btn-reintentar-detalle">
+                        Reintentar
+                    </button>
+                </div>
+            `;
+
+            document
+                .getElementById("btn-volver-catalogo")
+                .addEventListener("click", mostrarCatalogo);
+
+            document
+                .getElementById("btn-reintentar-detalle")
+                .addEventListener("click", () => mostrarDetalle(index));
+        }
     }
 
-    // Restaurar los detalles al recargar la página
-    // durante la misma sesión.
-    const cafeGuardado = sessionStorage.getItem("cafeSeleccionado");
-
-    if (cafeGuardado !== null) {
-        mostrarDetalle(Number(cafeGuardado));
-    } else {
-        mostrarCatalog();
-    }
+    iniciarAplicacion();
 }

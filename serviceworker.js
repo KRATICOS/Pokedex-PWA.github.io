@@ -1,19 +1,19 @@
-const CACHE_NAME = "coffee-pwa-v2";
+const CACHE_NAME = "Pokedex-PWA";
 
 const ARCHIVOS = [
     "./",
     "./index.html",
-    "./css/style.css",
+    "./CSS/style.css",
     "./js/app.js",
     "./manifest.json",
     "./images/cafe1.jpg",
-    "./images/icons/icon-72x72 (1).png",
-    "./images/icons/icon-96x96 (1).png",
-    "./images/icons/icon-128x128 (1).png",
-    "./images/icons/icon-144x144 (1).png",
-    "./images/icons/icon-152x152 (1).png",
-    "./images/icons/icon-192x192 (1).png",
-    "./images/icons/icon-512x512 (1).png"
+    "./images/icons/icon-72x72.png",
+    "./images/icons/icon-96x96.png",
+    "./images/icons/icon-128x128.png",
+    "./images/icons/icon-144x144.png",
+    "./images/icons/icon-152x152.png",
+    "./images/icons/icon-192x192.png",
+    "./images/icons/icon-512x512.png",
 ];
 
 // Instalación: guardar los recursos disponibles

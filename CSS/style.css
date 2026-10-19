@@ -1,3 +1,4 @@
+
 /* ================================
    CONFIGURACIÓN GENERAL
 ================================ */
@@ -8,11 +9,36 @@
     box-sizing: border-box;
 }
 
+:root {
+    --rojo: #dc0a2d;
+    --rojo-oscuro: #a80722;
+    --azul: #173f5f;
+    --amarillo: #ffcb05;
+    --fondo: #f2f4f7;
+    --blanco: #ffffff;
+    --texto: #263238;
+    --texto-secundario: #64748b;
+    --sombra: 0 8px 24px rgba(23, 63, 95, 0.12);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: Arial, Helvetica, sans-serif;
-    background: #f5eee6;
-    color: #3e2723;
+    background: var(--fondo);
+    color: var(--texto);
     min-height: 100vh;
+}
+
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+button {
+    font-family: inherit;
 }
 
 
@@ -27,17 +53,21 @@ main {
 
 
 /* ================================
-   NAVBAR
+   BARRA DE NAVEGACIÓN
 ================================ */
 
 nav {
-    background: linear-gradient(135deg, #4e342e, #795548);
-    color: white;
+    background: linear-gradient(135deg, var(--rojo), var(--rojo-oscuro));
+    color: var(--blanco);
     padding: 20px 6%;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 20px;
+
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
     position: sticky;
     top: 0;
     z-index: 100;
@@ -45,219 +75,332 @@ nav {
 
 nav h1 {
     font-size: 28px;
+    font-weight: 800;
     letter-spacing: 1px;
 }
 
 nav ul {
     list-style: none;
     display: flex;
+    align-items: center;
     gap: 25px;
 }
 
 nav li {
-    cursor: pointer;
     font-weight: bold;
-    transition: 0.3s;
+    transition: color 0.3s ease;
 }
 
-nav li:hover {
-    color: #ffcc80;
+nav a {
+    color: var(--blanco);
+    text-decoration: none;
+    display: inline-block;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+nav a:hover {
+    color: var(--amarillo);
     transform: translateY(-2px);
 }
 
 
 /* ================================
-   CONTENEDOR DE CARDS
+   CONTENEDOR DEL CATÁLOGO
 ================================ */
 
 .container {
     width: 90%;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 40px auto;
-    
+    padding-bottom: 30px;
+
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 25px;
 }
 
 
 /* ================================
-   CARD DE CAFÉ
+   TARJETAS DE POKÉMON
 ================================ */
 
-.coffee-card {
-    background: #ffffff;
-    border-radius: 18px;
+.pokemon-card {
+    background: var(--blanco);
+    border-radius: 20px;
     overflow: hidden;
 
-    box-shadow: 0 8px 20px rgba(62, 39, 35, 0.15);
-
-    transition: transform 0.3s ease,
-                box-shadow 0.3s ease;
+    border: 1px solid #e5e7eb;
+    box-shadow: var(--sombra);
 
     display: flex;
     flex-direction: column;
+    align-items: stretch;
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+
+    animation: aparecer 0.45s ease both;
 }
 
-.coffee-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 30px rgba(62, 39, 35, 0.25);
+.pokemon-card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 15px 32px rgba(23, 63, 95, 0.2);
 }
 
 
 /* ================================
-   IMAGEN
+   IMAGEN DEL POKÉMON
 ================================ */
 
-.coffee-card img {
+.pokemon-card img {
     width: 100%;
-    height: 210px;
-    object-fit: cover;
+    height: 220px;
+    padding: 18px;
+
+    object-fit: contain;
     display: block;
+
+    background:
+        radial-gradient(
+            circle,
+            #ffffff 0%,
+            #f1f5f9 70%,
+            #e2e8f0 100%
+        );
 }
 
 
 /* ================================
-   TÍTULO
+   NOMBRE DEL POKÉMON
 ================================ */
 
-.coffee-card h2 {
-    font-size: 22px;
-    margin: 18px 20px 10px;
-    color: #4e342e;
+.pokemon-card h2 {
+    font-size: 21px;
+    text-align: center;
+    text-transform: capitalize;
+
+    margin: 20px 15px 10px;
+    color: var(--azul);
 }
 
 
 /* ================================
-   DESCRIPCIÓN
+   INFORMACIÓN DEL POKÉMON
 ================================ */
 
-.coffee-card p {
-    font-size: 15px;
+.pokemon-card p {
+    font-size: 14px;
     line-height: 1.6;
-    color: #6d4c41;
+    text-align: center;
 
-    margin: 0 20px 20px;
-    
-    flex-grow: 1;
+    color: var(--texto-secundario);
+    margin: 0 15px 10px;
 }
 
 
 /* ================================
-   BOTÓN
+   BOTONES
 ================================ */
 
-.coffee-card button {
-    margin: 0 20px 20px;
-
-    padding: 12px 18px;
-
+.pokemon-card button,
+.pokemon-detalle-card button,
+.error-api button {
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
 
-    background: #6d4c41;
-    color: white;
+    background: var(--rojo);
+    color: var(--blanco);
 
     font-size: 15px;
     font-weight: bold;
 
+    padding: 13px 18px;
     cursor: pointer;
 
-    transition: 0.3s;
+    transition:
+        background 0.3s ease,
+        transform 0.2s ease,
+        box-shadow 0.3s ease;
 }
 
-.coffee-card button:hover {
-    background: #3e2723;
-    transform: scale(1.03);
+.pokemon-card button {
+    margin: auto 18px 20px;
 }
 
-.coffee-card button:active {
+.pokemon-card button:hover,
+.pokemon-detalle-card button:hover,
+.error-api button:hover {
+    background: var(--rojo-oscuro);
+    box-shadow: 0 5px 12px rgba(220, 10, 45, 0.2);
+}
+
+.pokemon-card button:active,
+.pokemon-detalle-card button:active,
+.error-api button:active {
     transform: scale(0.97);
 }
 
 
 /* ================================
-   TABLET
+   DETALLE DEL POKÉMON
 ================================ */
 
-@media (max-width: 768px) {
+.pokemon-detalle-card {
+    grid-column: 1 / -1;
 
-    nav {
-        padding: 18px 5%;
-    }
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 35px;
 
-    nav h1 {
-        font-size: 23px;
-    }
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
 
-    nav ul {
-        gap: 15px;
-    }
+    background: var(--blanco);
+    border-radius: 24px;
+    border: 1px solid #e5e7eb;
 
-    nav li {
-        font-size: 14px;
-    }
+    box-shadow: var(--sombra);
+    animation: aparecer 0.4s ease;
+}
 
-    .container {
-        width: 92%;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-    }
+.pokemon-detalle-card img {
+    width: 100%;
+    max-width: 320px;
+    height: 300px;
 
-    .coffee-card img {
-        height: 180px;
-    }
+    object-fit: contain;
+    padding: 15px;
+
+    background: #f1f5f9;
+    border-radius: 20px;
+}
+
+.pokemon-detalle-card h2 {
+    color: var(--azul);
+    font-size: 32px;
+    text-align: center;
+    text-transform: capitalize;
+}
+
+.pokemon-detalle-card h3 {
+    width: 100%;
+    margin-top: 12px;
+    padding-bottom: 10px;
+
+    color: var(--rojo);
+    font-size: 21px;
+
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.pokemon-detalle-card p {
+    width: 100%;
+    color: var(--texto-secundario);
+    font-size: 16px;
+    line-height: 1.7;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.pokemon-detalle-card ul {
+    width: 100%;
+    list-style: none;
+
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.pokemon-detalle-card li {
+    background: #f1f5f9;
+    padding: 12px 15px;
+    border-radius: 10px;
+
+    color: var(--azul);
+    font-weight: bold;
+    font-size: 14px;
+
+    overflow-wrap: anywhere;
+}
+
+.pokemon-detalle-card button {
+    margin-top: 15px;
+    width: 100%;
+    max-width: 280px;
 }
 
 
 /* ================================
-   CELULAR
+   MENSAJE DE CARGA
 ================================ */
 
-@media (max-width: 520px) {
+.container > p {
+    grid-column: 1 / -1;
 
-    nav {
-        flex-direction: column;
-        gap: 12px;
-        text-align: center;
-    }
+    padding: 50px 20px;
+    text-align: center;
 
-    nav h1 {
-        font-size: 25px;
-    }
-
-    nav ul {
-        gap: 20px;
-    }
-
-    .container {
-        width: 90%;
-        grid-template-columns: 1fr;
-        gap: 25px;
-        margin-top: 30px;
-    }
-
-    .coffee-card img {
-        height: 220px;
-    }
-
-    .coffee-card h2 {
-        font-size: 21px;
-    }
-
-    .coffee-card p {
-        font-size: 14px;
-    }
+    color: var(--azul);
+    font-size: 18px;
+    font-weight: bold;
 }
 
 
 /* ================================
-   EFECTO SUAVE AL CARGAR
+   MENSAJE DE ERROR
 ================================ */
 
-.coffee-card {
-    animation: aparecer 0.5s ease;
+.error-api {
+    grid-column: 1 / -1;
+
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 35px;
+
+    background: var(--blanco);
+    border-radius: 20px;
+    box-shadow: var(--sombra);
+
+    text-align: center;
 }
+
+.error-api h2 {
+    color: var(--rojo);
+    margin-bottom: 15px;
+}
+
+.error-api p {
+    color: var(--texto-secundario);
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+
+/* ================================
+   PIE DE PÁGINA
+================================ */
+
+footer {
+    background: var(--azul);
+    color: var(--blanco);
+
+    padding: 25px 15px;
+    text-align: center;
+    line-height: 1.8;
+}
+
+footer p {
+    font-size: 14px;
+}
+
+
+/* ================================
+   ANIMACIÓN
+================================ */
 
 @keyframes aparecer {
     from {
@@ -268,5 +411,179 @@ nav li:hover {
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+
+/* ================================
+   TABLET
+================================ */
+
+@media (max-width: 1000px) {
+    .container {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    nav {
+        padding: 18px 4%;
+    }
+
+    nav h1 {
+        font-size: 25px;
+    }
+}
+
+
+/* ================================
+   TABLET PEQUEÑA
+================================ */
+
+@media (max-width: 768px) {
+    nav {
+        padding: 18px 4%;
+    }
+
+    nav h1 {
+        font-size: 22px;
+    }
+
+    nav ul {
+        gap: 15px;
+    }
+
+    nav a {
+        font-size: 14px;
+    }
+
+    .container {
+        width: 92%;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 28px;
+    }
+
+    .pokemon-card img {
+        height: 190px;
+    }
+
+    .pokemon-card h2 {
+        font-size: 19px;
+    }
+
+    .pokemon-detalle-card {
+        padding: 25px;
+    }
+}
+
+
+/* ================================
+   CELULAR
+================================ */
+
+@media (max-width: 520px) {
+    nav {
+        flex-direction: column;
+        gap: 14px;
+        padding: 18px 12px;
+    }
+
+    nav h1 {
+        font-size: 25px;
+        text-align: center;
+    }
+
+    nav ul {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 18px;
+    }
+
+    nav a {
+        font-size: 13px;
+    }
+
+    .container {
+        width: 92%;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin: 22px auto;
+    }
+
+    .pokemon-card {
+        border-radius: 15px;
+    }
+
+    .pokemon-card img {
+        height: 145px;
+        padding: 10px;
+    }
+
+    .pokemon-card h2 {
+        font-size: 16px;
+        margin: 13px 8px 8px;
+    }
+
+    .pokemon-card p {
+        font-size: 12px;
+        margin: 0 8px 10px;
+        overflow-wrap: anywhere;
+    }
+
+    .pokemon-card button {
+        margin: auto 9px 12px;
+        padding: 11px 6px;
+        font-size: 13px;
+        border-radius: 9px;
+    }
+
+    .pokemon-detalle-card {
+        padding: 20px 15px;
+        gap: 13px;
+        border-radius: 18px;
+    }
+
+    .pokemon-detalle-card img {
+        height: 230px;
+    }
+
+    .pokemon-detalle-card h2 {
+        font-size: 26px;
+    }
+
+    .pokemon-detalle-card h3 {
+        font-size: 19px;
+    }
+
+    .pokemon-detalle-card p {
+        font-size: 14px;
+    }
+
+    .pokemon-detalle-card ul {
+        grid-template-columns: 1fr;
+    }
+
+    .pokemon-detalle-card li {
+        font-size: 13px;
+    }
+
+    .error-api {
+        padding: 25px 18px;
+    }
+}
+
+
+/* ================================
+   ACCESIBILIDAD
+================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }
