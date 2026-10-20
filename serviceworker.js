@@ -6,7 +6,6 @@ const ARCHIVOS = [
     "./CSS/style.css",
     "./js/app.js",
     "./manifest.json",
-    "./images/cafe1.jpg",
     "./images/icons/icon-72x72.png",
     "./images/icons/icon-96x96.png",
     "./images/icons/icon-128x128.png",

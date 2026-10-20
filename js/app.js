@@ -1,11 +1,26 @@
-
 const API_URL = "https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0";
 
 const container = document.querySelector(".container");
 
 let pokemones = [];
 
+const buscador = document.getElementById("buscadorPokemon");
+const botonLimpiar = document.getElementById("limpiarBusqueda");
+const mensajeBusqueda = document.getElementById("mensajeBusqueda");
+
 if (container) {
+    if (buscador) {
+        buscador.addEventListener("input", mostrarCatalogo);
+    }
+
+    if (botonLimpiar) {
+        botonLimpiar.addEventListener("click", () => {
+            buscador.value = "";
+            mostrarCatalogo();
+            buscador.focus();
+        });
+    }
+
     async function iniciarAplicacion() {
         container.style.display = "grid";
         container.innerHTML = "<p>Cargando Pokédex...</p>";
@@ -19,35 +34,30 @@ if (container) {
 
             const datos = await respuesta.json();
 
-            pokemones = datos.results.map(pokemon => {
-                const id = Number(
-                    pokemon.url.split("/").filter(Boolean).pop()
-                );
+            pokemones = datos.results.map((pokemon) => {
+                const id = Number(pokemon.url.split("/").filter(Boolean).pop());
 
                 return {
                     id,
                     nombre: pokemon.name,
                     url: pokemon.url,
-                    imagen: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`
+                    imagen: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
                 };
             });
 
             mostrarCatalogo();
 
-            const guardado = sessionStorage.getItem(
-                "pokemonSeleccionado"
-            );
+            const guardado = sessionStorage.getItem("pokemonSeleccionado");
 
             if (guardado !== null) {
                 const index = pokemones.findIndex(
-                    pokemon => pokemon.id === Number(guardado)
+                    (pokemon) => pokemon.id === Number(guardado)
                 );
 
                 if (index !== -1) {
                     mostrarDetalle(index);
                 }
             }
-
         } catch (error) {
             console.error("Error al cargar PokéAPI:", error);
 
@@ -55,7 +65,10 @@ if (container) {
             container.innerHTML = `
                 <div class="error-api">
                     <h2>No se pudo cargar la Pokédex</h2>
-                    <p>Verifica tu conexión a Internet e inténtalo de nuevo.</p>
+                    <p>
+                        Verifica tu conexión a Internet
+                        e inténtalo de nuevo.
+                    </p>
                     <button id="btn-reintentar">Reintentar</button>
                 </div>
             `;
@@ -69,11 +82,11 @@ if (container) {
     function capitalizar(texto) {
         return texto
             .split("-")
-            .map(palabra =>
-                palabra.charAt(0).toUpperCase() + palabra.slice(1)
-            )
+            .map((palabra) => palabra.charAt(0).toUpperCase() + palabra.slice(1))
             .join(" ");
     }
+
+    // Mostrar el catálogo y aplicar el filtro de búsqueda
 
     function mostrarCatalogo() {
         sessionStorage.removeItem("pokemonSeleccionado");
@@ -81,9 +94,37 @@ if (container) {
         container.style.display = "grid";
         container.innerHTML = "";
 
+        const busqueda = buscador ? buscador.value.trim().toLowerCase() : "";
+
+        const resultados = pokemones
+            .map((pokemon, index) => ({ pokemon, index }))
+            .filter(({ pokemon }) => {
+                return (
+                    pokemon.nombre.toLowerCase().includes(busqueda) ||
+                    String(pokemon.id).includes(busqueda)
+                );
+            });
+
+        if (mensajeBusqueda) {
+            mensajeBusqueda.textContent = busqueda
+                ? `Se encontraron ${resultados.length} Pokémon.`
+                : `Pokémon disponibles: ${resultados.length}`;
+        }
+
+        if (resultados.length === 0) {
+            container.style.display = "block";
+            container.innerHTML = `
+            <div class="sin-resultados">
+                <h2>No se encontraron Pokémon</h2>
+                <p>Intenta buscar con otro nombre o número.</p>
+            </div>
+        `;
+            return;
+        }
+
         const fragmento = document.createDocumentFragment();
 
-        pokemones.forEach((pokemon, index) => {
+        resultados.forEach(({ pokemon, index }) => {
             const card = document.createElement("article");
             card.className = "pokemon-card";
 
@@ -94,16 +135,14 @@ if (container) {
 
             imagen.onerror = () => {
                 imagen.onerror = null;
-                imagen.src =
-                    `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
+                imagen.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
             };
 
             const titulo = document.createElement("h2");
             titulo.textContent = capitalizar(pokemon.nombre);
 
             const numero = document.createElement("p");
-            numero.textContent =
-                `N.º ${String(pokemon.id).padStart(3, "0")}`;
+            numero.textContent = `N.º ${String(pokemon.id).padStart(3, "0")}`;
 
             const boton = document.createElement("button");
             boton.className = "btn-ver-mas";
@@ -128,10 +167,11 @@ if (container) {
             return;
         }
 
-        sessionStorage.setItem(
-            "pokemonSeleccionado",
-            String(pokemon.id)
-        );
+        sessionStorage.setItem("pokemonSeleccionado", String(pokemon.id));
+
+        // Ocultar el buscador en la vista de detalles
+        buscador.parentElement.style.display = "none";
+        mensajeBusqueda.style.display = "none";
 
         container.style.display = "block";
         container.innerHTML = "<p>Cargando detalles del Pokémon...</p>";
@@ -175,10 +215,7 @@ if (container) {
                 imagen,
                 titulo,
                 crearParrafo("Número", `#${detalle.id}`),
-                crearParrafo(
-                    "Tipos",
-                    detalle.types.map(t => t.type.name).join(", ")
-                ),
+                crearParrafo("Tipos", detalle.types.map((t) => t.type.name).join(", ")),
                 crearParrafo("Altura", `${detalle.height / 10} m`),
                 crearParrafo("Peso", `${detalle.weight / 10} kg`),
                 crearParrafo(
@@ -194,9 +231,8 @@ if (container) {
             card.appendChild(
                 crearParrafo(
                     "Habilidades",
-                    detalle.abilities
-                        .map(a => a.ability.name)
-                        .join(", ") || "No disponibles"
+                    detalle.abilities.map((a) => a.ability.name).join(", ") ||
+                    "No disponibles"
                 )
             );
 
@@ -206,11 +242,10 @@ if (container) {
 
             const lista = document.createElement("ul");
 
-            detalle.stats.forEach(stat => {
+            detalle.stats.forEach((stat) => {
                 const li = document.createElement("li");
 
-                li.textContent =
-                    `${capitalizar(stat.stat.name)}: ${stat.base_stat}`;
+                li.textContent = `${capitalizar(stat.stat.name)}: ${stat.base_stat}`;
 
                 lista.appendChild(li);
             });
@@ -227,7 +262,6 @@ if (container) {
             container.appendChild(card);
 
             window.scrollTo({ top: 0, behavior: "smooth" });
-
         } catch (error) {
             console.error("Error al cargar detalles:", error);
 

@@ -587,3 +587,64 @@ footer p {
         transition-duration: 0.01ms !important;
     }
 }
+
+
+
+/* Contenedor del buscador */
+.buscador-container {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+    box-sizing: border-box;
+}
+
+/* Campo de búsqueda */
+#buscadorPokemon {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 15px;
+    border: 2px solid #d3d3d3;
+    border-radius: 10px;
+    font-size: 16px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+#buscadorPokemon:focus {
+    border-color: #e3350d;
+}
+
+/* Botón para limpiar */
+#limpiarBusqueda {
+    padding: 12px 16px;
+    border: none;
+    border-radius: 10px;
+    background-color: #e3350d;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+#limpiarBusqueda:hover {
+    background-color: #b92708;
+}
+
+/* Mensajes del buscador */
+#mensajeBusqueda {
+    text-align: center;
+    margin: 10px 0 20px;
+    font-size: 15px;
+}
+
+/* Adaptación a pantallas pequeñas */
+@media (max-width: 480px) {
+    .buscador-container {
+        gap: 6px;
+    }
+
+    #limpiarBusqueda {
+        padding: 10px;
+    }
+}
